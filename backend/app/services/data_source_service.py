@@ -28,7 +28,11 @@ class DataSourceService:
 
         try:
             start_time = datetime.now()
-            async with httpx.AsyncClient(timeout=6.0) as client:
+            headers = {
+                "User-Agent": "RainfallIntelligence-Platform/1.0 (SIH26080; contact@sih26080.gov.in)",
+                "Accept": "application/json"
+            }
+            async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
                 res = await client.get(
                     f"{settings.OPEN_METEO_BASE_URL}/forecast",
                     params={"latitude": 28.6139, "longitude": 77.2090, "current": "temperature_2m"}

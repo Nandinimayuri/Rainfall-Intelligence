@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { CloudRain, MapPin, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CloudRain, MapPin, Clock, CheckCircle2, AlertCircle, Menu } from 'lucide-react';
 
 export default function TopHeader({
   selectedLocation,
-  isLiveConnected = true
+  isLiveConnected = true,
+  onToggleMobileNav
 }) {
   const [currentDateTime, setCurrentDateTime] = useState('');
 
@@ -30,22 +31,31 @@ export default function TopHeader({
   }, []);
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
+    <header className="h-14 sm:h-16 bg-white border-b border-slate-200 px-3.5 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
       {/* Branding & Hackathon Code */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-700 text-white shadow-xs">
-          <CloudRain className="w-5 h-5" />
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        {/* Mobile Hamburger Toggle Button */}
+        <button
+          onClick={onToggleMobileNav}
+          aria-label="Open Navigation Menu"
+          className="lg:hidden p-1.5 -ml-1 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors focus:outline-hidden"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-700 text-white shadow-xs shrink-0">
+          <CloudRain className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold text-slate-900 tracking-tight leading-none">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-none truncate">
               Rainfall Intelligence
             </h1>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded font-mono">
+            <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded font-mono shrink-0">
               SIH26080
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium">
+          <p className="hidden sm:block text-[11px] text-slate-500 font-medium truncate">
             Regime-Aware AI/ML Rainfall Forecast Intelligence Platform
           </p>
         </div>

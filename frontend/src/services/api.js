@@ -4,7 +4,34 @@
  * No direct calls to external APIs from the client.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const PROD_BACKEND_URL = 'https://rainfall-intelligence.onrender.com';
+
+const resolveApiBase = () => {
+  // 1. Explicit environment variable configured in Vite / Render build
+  if (import.meta.env.VITE_API_URL) {
+    const raw = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  }
+  if (import.meta.env.VITE_API_BASE_URL) {
+    const raw = import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  }
+
+  // 2. Production auto-detection:
+  // When running on Render static frontend (rainfall-intelligence-1.onrender.com),
+  // Vercel, or any mobile browser accessing deployed site, connect directly to deployed FastAPI backend.
+  if (typeof window !== 'undefined' && window.location) {
+    const hostname = window.location.hostname;
+    if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return `${PROD_BACKEND_URL}/api`;
+    }
+  }
+
+  // 3. Local development fallback (proxied by Vite)
+  return '/api';
+};
+
+export const API_BASE = resolveApiBase();
 
 async function handleResponse(response) {
   if (!response.ok) {

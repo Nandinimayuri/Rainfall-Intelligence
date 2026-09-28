@@ -23,27 +23,27 @@ function RainfallCompare({ raw, corrected, delta, forecastTime }) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-0 border border-slate-200 rounded-2xl overflow-hidden text-center bg-white shadow-xs">
-        <div className="bg-slate-50 py-6 px-4 border-r border-slate-200">
-          <div className="text-xs text-slate-500 uppercase tracking-wider mb-2 font-semibold">Raw NWP Forecast</div>
-          <div className="text-3xl font-bold font-mono text-slate-700">{raw.toFixed(2)}</div>
-          <div className="text-xs text-slate-400 mt-1">mm</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 border border-slate-200 rounded-2xl overflow-hidden text-center bg-white shadow-xs">
+        <div className="bg-slate-50 py-4 sm:py-6 px-3 sm:px-4 border-b sm:border-b-0 sm:border-r border-slate-200">
+          <div className="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wider mb-1.5 sm:mb-2 font-semibold">Raw NWP Forecast</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-700">{raw.toFixed(2)}</div>
+          <div className="text-xs text-slate-400 mt-0.5 sm:mt-1">mm</div>
         </div>
-        <div className="flex flex-col items-center justify-center py-6 px-2 bg-slate-50/50">
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center mb-1.5 ${
+        <div className="flex flex-col items-center justify-center py-4 sm:py-6 px-2 bg-slate-50/50 border-b sm:border-b-0 border-slate-200">
+          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center mb-1 sm:mb-1.5 ${
             improved ? (up ? 'bg-blue-100' : 'bg-amber-100') : 'bg-slate-100'
           }`}>
-            {improved ? (up ? <ArrowUp className="w-5 h-5 text-blue-600" /> : <ArrowDown className="w-5 h-5 text-amber-600" />) : <ArrowRight className="w-5 h-5 text-slate-400" />}
+            {improved ? (up ? <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" /> : <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />) : <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />}
           </div>
-          <div className={`text-sm font-bold font-mono ${up ? 'text-blue-600' : delta < 0 ? 'text-amber-600' : 'text-slate-400'}`}>
+          <div className={`text-sm sm:text-base font-bold font-mono ${up ? 'text-blue-600' : delta < 0 ? 'text-amber-600' : 'text-slate-400'}`}>
             {delta > 0 ? '+' : ''}{delta.toFixed(2)} mm
           </div>
-          <div className="text-[11px] text-slate-500 font-medium mt-0.5">Correction Delta</div>
+          <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5">Correction Delta</div>
         </div>
-        <div className="bg-blue-50/60 py-6 px-4 border-l border-slate-200">
-          <div className="text-xs text-blue-600 uppercase tracking-wider mb-2 font-semibold">Corrected Forecast</div>
-          <div className="text-3xl font-bold font-mono text-blue-700">{corrected.toFixed(2)}</div>
-          <div className="text-xs text-blue-400 mt-1">mm</div>
+        <div className="bg-blue-50/60 py-4 sm:py-6 px-3 sm:px-4 sm:border-l border-slate-200">
+          <div className="text-[11px] sm:text-xs text-blue-600 uppercase tracking-wider mb-1.5 sm:mb-2 font-semibold">Corrected Forecast</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-blue-700">{corrected.toFixed(2)}</div>
+          <div className="text-xs text-blue-400 mt-0.5 sm:mt-1">mm</div>
         </div>
       </div>
     </div>

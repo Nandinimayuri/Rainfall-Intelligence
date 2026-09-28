@@ -1,5 +1,6 @@
+import asyncio
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 import httpx
 from sqlalchemy.orm import Session
 
@@ -16,6 +17,11 @@ from app.schemas.weather import (
 )
 
 settings = get_settings()
+
+# In-memory forecast cache keyed by rounded (lat, lon) to absorb duplicate calls
+# and eliminate Open-Meteo rate limiting (HTTP 429) on shared cloud IPs
+_forecast_cache: Dict[str, Tuple[datetime, ForecastResponse]] = {}
+CACHE_TTL_SECONDS = 300  # 5 minutes fresh cache TTL
 
 WMO_WEATHER_CODES: Dict[int, str] = {
     0: "Clear sky",
@@ -71,6 +77,14 @@ class WeatherService:
         NO fake or dummy data is ever generated. If the live API is unreachable or errors,
         an exception is raised so the frontend can display a clear unavailable message.
         """
+        # 1. Check in-memory forecast cache (TTL = 300 seconds)
+        cache_key = f"{round(latitude, 3)}_{round(longitude, 3)}_{forecast_days}"
+        now_utc = datetime.now(timezone.utc)
+        if cache_key in _forecast_cache:
+            cached_time, cached_response = _forecast_cache[cache_key]
+            if (now_utc - cached_time).total_seconds() < CACHE_TTL_SECONDS:
+                return cached_response
+
         url = f"{settings.OPEN_METEO_BASE_URL}/forecast"
         params = {
             "latitude": latitude,
@@ -108,33 +122,51 @@ class WeatherService:
         if settings.WEATHER_API_KEY:
             params["apikey"] = settings.WEATHER_API_KEY
 
-        try:
-            async with httpx.AsyncClient(timeout=12.0) as client:
-                response = await client.get(url, params=params)
-                
-            if response.status_code != 200:
-                # Mark data source status in DB if available
-                if db:
-                    ds = db.query(DataSource).filter(DataSource.name.like("%Open-Meteo%")).first()
-                    if ds:
-                        ds.status = "Degraded"
-                        ds.last_status_check = datetime.now(timezone.utc)
-                        db.commit()
-                        
-                raise ValueError(
-                    f"External weather API returned HTTP {response.status_code}: {response.text}"
-                )
-                
-            raw_data = response.json()
-        except httpx.RequestError as exc:
+        headers = {
+            "User-Agent": "RainfallIntelligence-Platform/1.0 (SIH26080; contact@sih26080.gov.in)",
+            "Accept": "application/json"
+        }
+
+        raw_data = None
+        last_error = None
+
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(timeout=20.0, headers=headers) as client:
+                    response = await client.get(url, params=params)
+
+                if response.status_code == 200:
+                    raw_data = response.json()
+                    break
+                elif response.status_code == 429:
+                    # Rate limited: check if previous cached data exists to prevent disruption
+                    if cache_key in _forecast_cache:
+                        _, stale_response = _forecast_cache[cache_key]
+                        return stale_response
+                    if attempt == 0:
+                        await asyncio.sleep(1.0)
+                        continue
+                    last_error = "External weather API rate limited (HTTP 429)."
+                else:
+                    last_error = f"External weather API returned HTTP {response.status_code}: {response.text}"
+            except httpx.RequestError as exc:
+                last_error = f"Failed to connect to weather API ({str(exc)})"
+                if cache_key in _forecast_cache:
+                    _, stale_response = _forecast_cache[cache_key]
+                    return stale_response
+                if attempt == 0:
+                    await asyncio.sleep(1.0)
+                    continue
+
+        if raw_data is None:
             if db:
                 ds = db.query(DataSource).filter(DataSource.name.like("%Open-Meteo%")).first()
                 if ds:
-                    ds.status = "Offline"
+                    ds.status = "Degraded"
                     ds.last_status_check = datetime.now(timezone.utc)
                     db.commit()
             raise ConnectionError(
-                f"Live data currently unavailable: Failed to connect to weather API ({str(exc)})"
+                f"Live data currently unavailable: {last_error}"
             )
 
         # Update data source success status
@@ -244,7 +276,7 @@ class WeatherService:
                 except Exception:
                     db.rollback()
 
-        return ForecastResponse(
+        forecast_obj = ForecastResponse(
             latitude=raw_data.get("latitude", latitude),
             longitude=raw_data.get("longitude", longitude),
             state=state,
@@ -258,3 +290,5 @@ class WeatherService:
             hourly=hourly_forecast,
             daily=daily_summaries
         )
+        _forecast_cache[cache_key] = (now_utc, forecast_obj)
+        return forecast_obj

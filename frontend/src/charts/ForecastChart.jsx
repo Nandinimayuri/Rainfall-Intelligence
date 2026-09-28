@@ -97,26 +97,26 @@ export default function ForecastChart({
   };
 
   return (
-    <div className="bg-white p-5 border border-slate-200 rounded-xl shadow-xs">
+    <div className="bg-white p-3.5 sm:p-5 border border-slate-200 rounded-xl shadow-xs">
       {/* Chart Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5">
         <div>
           <div className="flex items-center gap-2">
             <CloudRain className="w-4 h-4 text-blue-700" />
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900">
               {title}
             </h3>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
             Raw Numerical Weather Prediction (NWP) model outputs from Open-Meteo
           </p>
         </div>
 
         {/* View Toggle */}
-        <div className="inline-flex p-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600">
+        <div className="inline-flex p-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600 w-full sm:w-auto justify-between sm:justify-start">
           <button
             onClick={() => setViewMode('hourly')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-md transition-all text-[11px] sm:text-xs ${
               viewMode === 'hourly' 
                 ? 'bg-white text-blue-700 shadow-xs font-semibold' 
                 : 'hover:text-slate-900'
@@ -126,7 +126,7 @@ export default function ForecastChart({
           </button>
           <button
             onClick={() => setViewMode('daily')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-md transition-all text-[11px] sm:text-xs ${
               viewMode === 'daily' 
                 ? 'bg-white text-blue-700 shadow-xs font-semibold' 
                 : 'hover:text-slate-900'
@@ -138,7 +138,7 @@ export default function ForecastChart({
       </div>
 
       {/* Chart Container */}
-      <div className="h-72 w-full">
+      <div className="h-64 sm:h-72 w-full">
         {chartData.length === 0 ? (
           <div className="h-full flex items-center justify-center text-xs text-slate-400">
             No forecast points available for selected horizon.

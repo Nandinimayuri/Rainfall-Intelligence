@@ -51,8 +51,8 @@ function ProbBar({ regime, probability, isTop }) {
     slate: 'bg-slate-500',
   };
   return (
-    <div className={`flex items-center gap-3 py-1.5 ${isTop ? 'font-semibold' : ''}`}>
-      <span className="text-xs text-slate-600 w-48 shrink-0 truncate">{REGIME_META[regime]?.emoji} {regime}</span>
+    <div className={`flex items-center gap-2 sm:gap-3 py-1.5 ${isTop ? 'font-semibold' : ''}`}>
+      <span className="text-xs text-slate-600 w-32 sm:w-48 shrink-0 truncate">{REGIME_META[regime]?.emoji} {regime}</span>
       <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
         <div
           className={`h-2.5 rounded-full transition-all duration-500 ${colorBar[meta.color] || 'bg-slate-400'}`}

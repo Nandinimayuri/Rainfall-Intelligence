@@ -31,13 +31,24 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "openai"
     LLM_TIMEOUT_SECONDS: int = 25
     
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+    CORS_ORIGINS: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,"
+        "https://rainfall-intelligence-1.onrender.com,https://rainfall-intelligence.onrender.com"
+    )
 
     @property
     def cors_origins_list(self) -> List[str]:
         if self.CORS_ORIGINS.strip() == "*":
             return ["*"]
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        defaults = [
+            "https://rainfall-intelligence-1.onrender.com",
+            "https://rainfall-intelligence.onrender.com"
+        ]
+        for d in defaults:
+            if d not in origins:
+                origins.append(d)
+        return origins
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -199,10 +199,10 @@ export default function HeavyRainfallRiskPage({ selectedLocation, onLocationChan
               <h3 className="text-base font-bold text-slate-800">Rainfall Quantities</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <div className="text-xs text-slate-500 mb-1">Raw NWP Forecast</div>
-                <div className="text-2xl font-bold font-mono text-slate-700">
+                <div className="text-xl sm:text-2xl font-bold font-mono text-slate-700">
                   {data.raw_rainfall_mm.toFixed(2)} <span className="text-xs text-slate-400 font-normal">mm</span>
                 </div>
                 <div className="text-[11px] text-slate-400 mt-1">Uncorrected model output</div>
@@ -210,7 +210,7 @@ export default function HeavyRainfallRiskPage({ selectedLocation, onLocationChan
 
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                 <div className="text-xs text-blue-600 mb-1 font-medium">ML Corrected Forecast</div>
-                <div className="text-2xl font-bold font-mono text-blue-700">
+                <div className="text-xl sm:text-2xl font-bold font-mono text-blue-700">
                   {data.corrected_rainfall_mm.toFixed(2)} <span className="text-xs text-blue-400 font-normal">mm</span>
                 </div>
                 <div className="text-[11px] text-blue-500 mt-1">Regime-adjusted forecast</div>

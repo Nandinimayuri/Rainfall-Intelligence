@@ -11,10 +11,11 @@ import {
   History,
   Activity,
   MessageSquare,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from 'lucide-react';
 
-export default function Sidebar({ activePage, onNavigate }) {
+export default function Sidebar({ activePage, onNavigate, isOpen = false, onClose }) {
   const foundationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'forecast', label: 'Live Forecast', icon: CloudSunRain },
@@ -38,13 +39,18 @@ export default function Sidebar({ activePage, onNavigate }) {
     { id: 'data-sources', label: 'Data Sources', icon: Database },
   ];
 
+  const handleNavClick = (id) => {
+    onNavigate(id);
+    if (onClose) onClose();
+  };
+
   const NavButton = ({ item }) => {
     const Icon = item.icon;
     const isActive = activePage === item.id;
     return (
       <button
         key={item.id}
-        onClick={() => onNavigate(item.id)}
+        onClick={() => handleNavClick(item.id)}
         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
           isActive
             ? 'bg-blue-600 text-white font-semibold shadow-xs'
@@ -58,19 +64,44 @@ export default function Sidebar({ activePage, onNavigate }) {
   };
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800">
-      {/* Brand */}
-      <div className="p-5 border-b border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-inner">
-            RI
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div 
+          onClick={onClose}
+          aria-label="Close navigation overlay"
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+        />
+      )}
+
+      {/* Sidebar Drawer */}
+      <aside 
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
+      >
+        {/* Brand */}
+        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-inner">
+              RI
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white tracking-wide">Rainfall Intel</div>
+              <div className="text-[10px] text-blue-400 font-mono font-medium">SIH26080 · AI/ML</div>
+            </div>
           </div>
-          <div>
-            <div className="text-sm font-bold text-white tracking-wide">Rainfall Intel</div>
-            <div className="text-[10px] text-blue-400 font-mono font-medium">SIH26080 · AI/ML</div>
-          </div>
+          {/* Mobile Close Button */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              aria-label="Close sidebar menu"
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
-      </div>
 
       {/* Navigation */}
       <nav className="p-3 space-y-4 flex-1 overflow-y-auto">
@@ -132,5 +163,6 @@ export default function Sidebar({ activePage, onNavigate }) {
         </div>
       </div>
     </aside>
+    </>
   );
 }
