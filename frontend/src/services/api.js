@@ -4,7 +4,7 @@
  * No direct calls to external APIs from the client.
  */
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function handleResponse(response) {
   if (!response.ok) {
